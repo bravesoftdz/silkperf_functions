@@ -27,8 +27,11 @@ var
   hFile, nSize : number;
   sFileName : string init "json.txt";
   sFileContent: string;
-  
   nOccupied : number;
+  
+  hJson, hJsonDeliveryAddresses, hJsonAddresses, hJsonAddress : number;
+  sId, sLine1: string;
+  
   
 // Random Variables Section 
 dclrand
@@ -40,7 +43,7 @@ dcluser
     VirtUser
   transactions
     TInit           : begin;  // Initialization
-    InsertionSort       : 1;     // Transactions
+    Trans       : 1;     // Transactions
     TEnd            : end;    // Termination
                               
 // Transactions Section
@@ -68,7 +71,7 @@ dcltrans
     
   end TInit;
   
-  transaction InsertionSort
+  transaction Trans
   begin
     
     //Insertion sort
@@ -88,6 +91,8 @@ dcltrans
       Print(string(ArrVar1[i]));
       
     end;
+    // ---------------------------------------- end of insertion sort
+    
     
     //Open file to get the json content
     FOpen(hFile, sFileName);
@@ -97,11 +102,29 @@ dcltrans
     FRead(hFile,sFileContent, nSize);
     
     write(sFileContent);
+    
     //Lets do some json parsing.
     
+    hJson := JsonParse(sFileContent);
     
+    // get the property deliveryaddresses which is an object
+    JsonGetObjectProperty(hJson, "deliveryAddresses", hJsonDeliveryAddresses);
     
-  end InsertionSort;
+    // get the property called addresses which is an array of objects
+    JsonGetArrayProperty(hJsonDeliveryAddresses, "addresses", hJsonAddresses);
+    
+    // get the first element from the array
+    JsonArrayGetObjectElement(hJsonAddresses, 0, hJsonAddress);
+    
+    // get the properties from from the address object
+    JsonGetStringProperty(hJsonAddress, "id", sId); 
+    JsonGetStringProperty(hJsonAddress, "line1", sline1);
+    
+    Print("Address id: "+sId+" line1: "+ sline1);
+    
+    //------------------------------------------------------------------------- phew!
+    
+  end Trans;
 
   transaction TEnd
   begin
